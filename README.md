@@ -3,9 +3,14 @@ Web applications using a microservices architecture with Java, Spring Boot, and 
 
 Technologies used in this project include / will include:
 
-Spring Boot 2.2.1
-Spring Cloud Hoxton.M3
-RabbitMQ
-Docker and Docker Compose
-PostgreSQL
-JUnit 4 and 5
+. Spring Boot 2.2.1
+
+. Docker and Docker Compose
+
+. PostgreSQL
+
+. Spring Cloud Hoxton.M3
+
+. RabbitMQ
+
+. JUnit 4 and 5
