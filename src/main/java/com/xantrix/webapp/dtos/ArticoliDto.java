@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+@Data
 public class ArticoliDto {
     private String codArt;
     private String descrizione;
@@ -13,7 +14,7 @@ public class ArticoliDto {
     private Integer pzCart;
     private double pesoNetto;
     private String idStatoArt;
-    private Date dataCreaz;
+    private Date dataCreazione;
     private double prezzo = 0;
 
     private Set<BarcodeDto> barcode = new HashSet<>();
