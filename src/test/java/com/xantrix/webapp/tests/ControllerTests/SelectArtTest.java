@@ -133,7 +133,7 @@ public class SelectArtTest
 				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.code").value(404))
-				.andExpect(jsonPath("$.message").value("Il barcode " + Barcode + " non è stato trovato!"))
+				.andExpect(jsonPath("$.message").value("Il barcode " + Barcode + " non e' stato trovato!"))
 				.andDo(print());
 	}
 	
@@ -161,7 +161,7 @@ public class SelectArtTest
 				.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.code").value(404))
-				.andExpect(jsonPath("$.message").value("L'articolo con codice " + CodArt + " non è stato trovato!"))
+				.andExpect(jsonPath("$.message").value("L'articolo con codice " + CodArt + " non e' stato trovato!"))
 				.andDo(print());
 	}
 	
@@ -176,7 +176,21 @@ public class SelectArtTest
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$", hasSize(1)))
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-				.andExpect(content().json(JsonData2)) 
+				.andExpect(content().json(JsonData2))
 				.andReturn();
+	}
+
+	@Test
+	@Order(6)
+	public void errlistArtByDesc()  throws Exception
+	{
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/articoli/cerca/descrizione/ABC1234")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(JsonData)
+						.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.code").value(404))
+				.andExpect(jsonPath("$.message").value("Non e' stato trovato alcun articolo avente descrizione ABC1234"))
+				.andDo(print());
 	}
 }
