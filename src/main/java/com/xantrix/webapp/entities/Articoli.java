@@ -17,13 +17,11 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import com.xantrix.webapp.validation.CodArt;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -44,6 +42,7 @@ public class Articoli  implements Serializable
 	@Column(name = "CODART")
 	@Size(min = 5, max = 20, message = "{Size.Articoli.codArt.Validation}")
 	@NotNull(message = "{NotNull.Articoli.codArt.Validation}")
+	@CodArt
 	private String codArt;
 	
 	@Column(name = "DESCRIZIONE")
@@ -54,6 +53,7 @@ public class Articoli  implements Serializable
 	private String um;
 	
 	@Column(name = "CODSTAT")
+	@NotBlank(message = "{NotBlank.Articoli.codStat.Validation}")
 	private String codStat;
 	
 	@Column(name = "PZCART")
@@ -80,10 +80,12 @@ public class Articoli  implements Serializable
 	
 	@ManyToOne
 	@JoinColumn(name = "IDIVA", referencedColumnName = "idIva")
+	@NotNull(message =  "{NotNull.Articoli.iva.validation}")
 	private Iva iva;
 	
 	@ManyToOne
 	@JoinColumn(name = "IDFAMASS", referencedColumnName = "ID")
+	@NotNull(message =  "{NotNull.Articoli.famAssort.validation}")
 	private FamAssort famAssort;
 	
 }

@@ -38,8 +38,8 @@ public class MessageConfig
     public LocaleResolver localeResolver()
     {
         SessionLocaleResolver sessionLocaleResolver = new SessionLocaleResolver();
-        //sessionLocaleResolver.setDefaultLocale(LocaleContextHolder.getLocale());
-        sessionLocaleResolver.setDefaultLocale(new Locale("it"));
+        sessionLocaleResolver.setDefaultLocale(LocaleContextHolder.getLocale());//italiano
+        //sessionLocaleResolver.setDefaultLocale(new Locale("en"));
 
         return sessionLocaleResolver;
     }
