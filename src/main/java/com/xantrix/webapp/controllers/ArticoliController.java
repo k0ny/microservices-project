@@ -1,19 +1,27 @@
 package com.xantrix.webapp.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xantrix.webapp.dtos.ArticoliDto;
+import com.xantrix.webapp.dtos.InfoMsg;
 import com.xantrix.webapp.entities.Articoli;
+import com.xantrix.webapp.exceptions.BindingException;
+import com.xantrix.webapp.exceptions.DuplicateException;
 import com.xantrix.webapp.exceptions.NotFoundException;
 import com.xantrix.webapp.services.ArticoliService;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -23,6 +31,9 @@ public class ArticoliController
 {
     @Autowired
     private ArticoliService articoliService;
+
+    @Autowired
+    private ResourceBundleMessageSource errMessage;
 
     @SneakyThrows
     @GetMapping(value = "/cerca/barcode/{ean}", produces = "application/json")
@@ -71,4 +82,88 @@ public class ArticoliController
         }
         return new ResponseEntity<List<ArticoliDto>>(articoli, HttpStatus.OK); //else OK 200
     }
+
+    @SneakyThrows
+    @PostMapping(value = "/inserisci", produces = "application/json")
+    public ResponseEntity<InfoMsg> createArt(@Valid @RequestBody Articoli articolo, BindingResult bindingResult) //@Valid fa la validazione dell'input
+    {
+        log.info("Salviamo l'articolo con codice " + articolo.getCodArt());
+
+        //controllo validità dati articolo
+        if (bindingResult.hasErrors())
+        {
+            String MsgErr = errMessage.getMessage(bindingResult.getFieldError(), LocaleContextHolder.getLocale());
+            log.warning(MsgErr);
+            throw new BindingException(MsgErr);
+        }
+
+        //Disabilitare se si vuole gestire anche la modifica
+        ArticoliDto checkArt =  articoliService.SelByCodArt(articolo.getCodArt());
+
+        if (checkArt != null)
+        {
+            String MsgErr = String.format("Articolo %s presente in anagrafica! "
+                    + "Impossibile utilizzare il metodo POST", articolo.getCodArt());
+
+            log.warning(MsgErr);
+            throw new DuplicateException(MsgErr);
+        }
+
+        articoliService.InsArticolo(articolo);
+
+        return new ResponseEntity<InfoMsg>(new InfoMsg(LocalDate.now(),
+                "Inserimento Articolo Eseguita con successo!"), HttpStatus.CREATED);
+    }
+
+    // ------------------- MODIFICA ARTICOLO ------------------------------------
+    @SneakyThrows
+    @RequestMapping(value = "/modifica", method = RequestMethod.PUT)
+    public ResponseEntity<InfoMsg> updateArt(@Valid @RequestBody Articoli articolo, BindingResult bindingResult)
+    {
+        log.info("Modifichiamo l'articolo con codice " + articolo.getCodArt());
+        if (bindingResult.hasErrors())
+        {
+            String MsgErr = errMessage.getMessage(bindingResult.getFieldError(), LocaleContextHolder.getLocale());
+            log.warning(MsgErr);
+            throw new BindingException(MsgErr);
+        }
+
+        ArticoliDto checkArt =  articoliService.SelByCodArt(articolo.getCodArt());
+        if (checkArt == null)
+        {
+            String MsgErr = String.format("Articolo %s non presente in anagrafica! "
+                    + "Impossibile utilizzare il metodo PUT", articolo.getCodArt());
+            log.warning(MsgErr);
+            throw new NotFoundException(MsgErr);
+        }
+        articoliService.InsArticolo(articolo);
+        return new ResponseEntity<InfoMsg>(new InfoMsg(LocalDate.now(),
+                "Modifica Articolo Eseguita con successo!"), HttpStatus.CREATED);
+    }
+
+    // ------------------- ELIMINAZIONE ARTICOLO ------------------------------------
+    @SneakyThrows
+    @DeleteMapping(value = "/elimina/{codart}", produces = "application/json" )
+    public ResponseEntity<?> deleteArt(@PathVariable("codart") String CodArt)
+    {
+        log.info("Eliminiamo l'articolo con codice " + CodArt);
+        Articoli articolo = articoliService.SelByCodArt2(CodArt);
+        if (articolo == null)
+        {
+            String MsgErr = String.format("Articolo %s non presente in anagrafica!",CodArt);
+            log.warning(MsgErr);
+            throw new NotFoundException(MsgErr);
+        }
+
+        articoliService.DelArticolo(articolo);
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode responseNode = mapper.createObjectNode();
+
+        responseNode.put("code", HttpStatus.OK.toString());
+        responseNode.put("message", "Eliminazione Articolo " + CodArt + " Eseguita Con Successo");
+
+        return new ResponseEntity<>(responseNode, new HttpHeaders(), HttpStatus.OK);
+
+    }
+
 }

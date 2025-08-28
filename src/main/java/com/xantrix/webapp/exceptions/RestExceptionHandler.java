@@ -22,4 +22,26 @@ public class RestExceptionHandler extends  ResponseEntityExceptionHandler
 
         return new ResponseEntity<ErrorResponse>(errore, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(BindingException.class)
+    public final ResponseEntity<ErrorResponse> exceptionBindingHandler(Exception ex)
+    {
+        ErrorResponse errore = new ErrorResponse();
+
+        errore.setCode(HttpStatus.BAD_REQUEST.value());
+        errore.setMessage(ex.getMessage());
+
+        return new ResponseEntity<ErrorResponse>(errore, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DuplicateException.class)
+    public ResponseEntity<ErrorResponse> exceptionDeplicateRecordHandler(Exception ex)
+    {
+        ErrorResponse errore = new ErrorResponse();
+
+        errore.setCode(HttpStatus.NOT_ACCEPTABLE.value());
+        errore.setMessage(ex.getMessage());
+
+        return new ResponseEntity<ErrorResponse>(errore, HttpStatus.NOT_ACCEPTABLE);
+    }
 }

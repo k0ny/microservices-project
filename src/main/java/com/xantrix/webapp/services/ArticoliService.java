@@ -9,6 +9,7 @@ public interface ArticoliService {
      List<ArticoliDto> SelByDescrizione(String descrizione);
      List<ArticoliDto> SelByDescrizione(String descrizione, Pageable paegeable);
      ArticoliDto SelByCodArt(String codart);
+     Articoli SelByCodArt2(String codart); //per l'eliminazione
      ArticoliDto SelByBarcode(String barcode);
      void DelArticolo(Articoli articolo);
      void InsArticolo(Articoli articolo);

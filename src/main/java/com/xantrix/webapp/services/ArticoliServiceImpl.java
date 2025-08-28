@@ -51,8 +51,14 @@ public class ArticoliServiceImpl implements ArticoliService
     @Override
     public ArticoliDto SelByCodArt(String codart)
     {
-        Articoli articoli = articoliRepository.findByCodArt(codart);
+        Articoli articoli = this.SelByCodArt2(codart); //uso il SelByCodArt2 per evitare duplicazioni
         return this.ConvertToDto(articoli);
+    }
+
+    @Override
+    public Articoli SelByCodArt2(String codart) //per l'liminazione
+    {
+        return articoliRepository.findByCodArt(codart);
     }
 
     @Override
@@ -70,7 +76,9 @@ public class ArticoliServiceImpl implements ArticoliService
 
     @Override
     @Transactional
-    public void InsArticolo(Articoli articolo) {
+    public void InsArticolo(Articoli articolo)
+    {
+        articolo.setDescrizione(articolo.getDescrizione().toUpperCase());
         articoliRepository.save(articolo);
     }
 
