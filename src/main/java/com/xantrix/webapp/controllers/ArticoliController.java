@@ -9,6 +9,7 @@ import com.xantrix.webapp.exceptions.BindingException;
 import com.xantrix.webapp.exceptions.DuplicateException;
 import com.xantrix.webapp.exceptions.NotFoundException;
 import com.xantrix.webapp.services.ArticoliService;
+import io.swagger.annotations.*;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/articoli")
+@Api(value = "alphashop", tags="Controller Operazioni di gestione dati articoli") //per ottenere informazioni sulla documentazione Swagger
 @Log
 public class ArticoliController
 {
@@ -35,15 +37,28 @@ public class ArticoliController
     @Autowired
     private ResourceBundleMessageSource errMessage;
 
+    // Ricerca per Barcode
+    @ApiOperation(
+            value="Ricerca l'articolo per BARCODE",
+            notes = "Restituisce i dati dell'articolo in formato JSON",
+            response = Articoli.class,
+            produces = "application/json")
+    @ApiResponses(value =
+            {   @ApiResponse(code = 200, message = "L'articolo cercato è stato trovato!"),
+                @ApiResponse(code = 404, message = "L'articolo cercato NON è stato trovato!"),
+                @ApiResponse(code = 403, message = "Non sei AUTORIZZATO ad accedere alle informazioni"),
+                @ApiResponse(code = 401, message = "Non sei AUTENTICATO")
+            })
     @SneakyThrows
     @GetMapping(value = "/cerca/barcode/{ean}", produces = "application/json")
-    public ResponseEntity<ArticoliDto> listArtByEan(@PathVariable("ean") String Ean)
+    public ResponseEntity<ArticoliDto> listArtByEan(@ApiParam("Barcode univoco dell'articolo") @PathVariable("barcode") String Barcode)
+            throws NotFoundException
     {
-        log.info(String.format("**** Articolo con barcode %s ****", Ean));
-        ArticoliDto articolo = articoliService.SelByBarcode(Ean);
+        log.info(String.format("**** Articolo con barcode %s ****", Barcode));
+        ArticoliDto articolo = articoliService.SelByBarcode(Barcode);
 
         if(articolo == null){ //se non trovo articolo con barcode restituisco un 404
-            String ErrMsg = String.format("Il barcode %s non e' stato trovato!", Ean);
+            String ErrMsg = String.format("Il barcode %s non e' stato trovato!", Barcode);
             log.warning(ErrMsg);
 
             throw new NotFoundException(ErrMsg);//funziona con annotazione SneakyThrows

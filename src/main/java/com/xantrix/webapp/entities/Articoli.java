@@ -22,6 +22,7 @@ import javax.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import com.xantrix.webapp.validation.CodArt;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -43,6 +44,7 @@ public class Articoli  implements Serializable
 	@Size(min = 5, max = 20, message = "{Size.Articoli.codArt.Validation}")
 	@NotNull(message = "{NotNull.Articoli.codArt.Validation}")
 	@CodArt
+	@ApiModelProperty(notes="Il Codice Interno Univoco dell'Articolo")
 	private String codArt;
 	
 	@Column(name = "DESCRIZIONE")
