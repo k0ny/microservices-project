@@ -7,9 +7,17 @@ import com.xantrix.webapp.dtos.InfoMsg;
 import com.xantrix.webapp.entities.Articoli;
 import com.xantrix.webapp.exceptions.BindingException;
 import com.xantrix.webapp.exceptions.DuplicateException;
+import com.xantrix.webapp.exceptions.ErrorResponse;
 import com.xantrix.webapp.exceptions.NotFoundException;
 import com.xantrix.webapp.services.ArticoliService;
-import io.swagger.annotations.*;
+//import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +35,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/articoli")
-@Api(value = "alphashop", tags="Controller Operazioni di gestione dati articoli") //per ottenere informazioni sulla documentazione Swagger
+//@Api(value = "alphashop", tags="Controller Operazioni di gestione dati articoli") //per ottenere informazioni sulla documentazione Swagger
+@Tag(name = "ArticoliController", description = "Controller Operazioni di Gestione Dati Articoli")
 @Log
 public class ArticoliController
 {
@@ -38,20 +47,20 @@ public class ArticoliController
     private ResourceBundleMessageSource errMessage;
 
     // Ricerca per Barcode
-    @ApiOperation(
-            value="Ricerca l'articolo per BARCODE",
-            notes = "Restituisce i dati dell'articolo in formato JSON",
-            response = Articoli.class,
-            produces = "application/json")
-    @ApiResponses(value =
-            {   @ApiResponse(code = 200, message = "L'articolo cercato è stato trovato!"),
-                @ApiResponse(code = 404, message = "L'articolo cercato NON è stato trovato!"),
-                @ApiResponse(code = 403, message = "Non sei AUTORIZZATO ad accedere alle informazioni"),
-                @ApiResponse(code = 401, message = "Non sei AUTENTICATO")
-            })
+    @Operation(summary = "Ricerca l'articolo per BARCODE", description = "Restituisce i dati dell'articolo in formato JSON",
+            tags = { "ArticoliDto" }) //introdotta con OpenAi
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "L'articolo cercato è stato trovato!",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ArticoliDto.class))),
+            @ApiResponse(responseCode = "401", description = "Utente non AUTENTICATO", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Utente Non AUTORIZZATO ad accedere alle informazioni", content = @Content),
+            @ApiResponse(responseCode = "404", description = "L'articolo cercato NON è stato trovato!",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))) })
     @SneakyThrows
     @GetMapping(value = "/cerca/barcode/{ean}", produces = "application/json")
-    public ResponseEntity<ArticoliDto> listArtByEan(@ApiParam("Barcode univoco dell'articolo") @PathVariable("barcode") String Barcode)
+    public ResponseEntity<ArticoliDto> listArtByEan( // Ricerca per Barcode
+            @Parameter(description="Barcode Articolo", required=true)
+            @PathVariable("barcode") String Barcode)
             throws NotFoundException
     {
         log.info(String.format("**** Articolo con barcode %s ****", Barcode));
