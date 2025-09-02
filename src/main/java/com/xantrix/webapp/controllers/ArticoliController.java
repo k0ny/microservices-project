@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xantrix.webapp.dtos.ArticoliDto;
 import com.xantrix.webapp.dtos.InfoMsg;
 import com.xantrix.webapp.entities.Articoli;
-import com.xantrix.webapp.exceptions.BindingException;
-import com.xantrix.webapp.exceptions.DuplicateException;
-import com.xantrix.webapp.exceptions.ErrorResponse;
-import com.xantrix.webapp.exceptions.NotFoundException;
+import com.xantrix.webapp.entities.exceptions.BindingException;
+import com.xantrix.webapp.entities.exceptions.DuplicateException;
+import com.xantrix.webapp.entities.exceptions.ErrorResponse;
+import com.xantrix.webapp.entities.exceptions.NotFoundException;
 import com.xantrix.webapp.services.ArticoliService;
 //import io.swagger.annotations.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,11 +63,11 @@ public class ArticoliController
             @PathVariable("barcode") String Barcode)
             throws NotFoundException
     {
-        log.info(String.format("**** Articolo con barcode %s ****", Barcode));
+        log.info(String.format("************ Articolo con barcode: %s ************ ", Barcode));
         ArticoliDto articolo = articoliService.SelByBarcode(Barcode);
 
         if(articolo == null){ //se non trovo articolo con barcode restituisco un 404
-            String ErrMsg = String.format("Il barcode %s non e' stato trovato!", Barcode);
+            String ErrMsg = String.format("************  Il barcode %s non e' stato trovato! ************ ", Barcode);
             log.warning(ErrMsg);
 
             throw new NotFoundException(ErrMsg);//funziona con annotazione SneakyThrows
@@ -79,11 +79,11 @@ public class ArticoliController
     @GetMapping(value = "/cerca/codice/{codart}", produces = "application/json")
     public ResponseEntity<ArticoliDto> listArtByCodArt(@PathVariable("codart") String CodArt)
     {
-        log.info(String.format("**** Articolo con codice %s ****", CodArt));
+        log.info(String.format("************ Articolo con codice: %s ************ ", CodArt));
         ArticoliDto articolo = articoliService.SelByCodArt(CodArt);
 
         if(articolo == null){ //se non trovo articolo con barcode restituisco un 404
-            String ErrMsg = String.format("L'articolo con codice %s non e' stato trovato!", CodArt);
+            String ErrMsg = String.format("************ L'articolo con codice %s non e' stato trovato! ************ ", CodArt);
             log.warning(ErrMsg);
 
             throw new NotFoundException(ErrMsg);//funziona con annotazione SneakyThrows
@@ -95,11 +95,11 @@ public class ArticoliController
     @GetMapping (value = "/cerca/descrizione/{filter}", produces = "application/json")
     public ResponseEntity<List<ArticoliDto>> listArtByDesc(@PathVariable("filter") String Filter)
     {
-        log.info(String.format("**** Articoli con Descrizione %s ****", Filter));
+        log.info(String.format("************  Articoli con Descrizione: %s ************ ", Filter));
         List<ArticoliDto> articoli = articoliService.SelByDescrizione(Filter);
 
         if(articoli.isEmpty()){ //se non trovo articoli con il filtro restituisco un 404
-            String ErrMsg = String.format("Non e' stato trovato alcun articolo avente descrizione %s", Filter);
+            String ErrMsg = String.format("************ Non e' stato trovato alcun articolo avente descrizione: %s ************ ", Filter);
             log.warning(ErrMsg);
 
             throw new NotFoundException(ErrMsg);//funziona con annotazione SneakyThrows
@@ -111,7 +111,7 @@ public class ArticoliController
     @PostMapping(value = "/inserisci", produces = "application/json")
     public ResponseEntity<InfoMsg> createArt(@Valid @RequestBody Articoli articolo, BindingResult bindingResult) //@Valid fa la validazione dell'input
     {
-        log.info("Salviamo l'articolo con codice " + articolo.getCodArt());
+        log.info("************ Salviamo l'articolo con codice " + articolo.getCodArt() + "************");
 
         //controllo validità dati articolo
         if (bindingResult.hasErrors())
