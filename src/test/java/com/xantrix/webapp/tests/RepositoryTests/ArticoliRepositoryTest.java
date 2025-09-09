@@ -40,7 +40,7 @@ public class ArticoliRepositoryTest
 		Date date = new Date();
 		
 		//CLASSE ENTITY ARTICOLI
-		Articoli articolo = new Articoli("Vincenzo","Articolo di Test V","PZ","",6,1.75,"1",
+		Articoli articolo = new Articoli("5001234","Articolo di Test V","PZ","TEST",6,1.75,"1",
 				date,null,null,null,null);
 		
 		//CLASSE ENTITY FAMASSORT
@@ -60,12 +60,12 @@ public class ArticoliRepositoryTest
 		
 		//CLASSE ENTITY ingredienti
 		Ingredienti ingredienti = new Ingredienti();
-		ingredienti.setCodArt("Vincenzo");
+		ingredienti.setCodArt("5001234");
 		ingredienti.setInfo("Test inserimento ingredienti");
 		
 		articoliRepository.save(articolo);
 		
-		assertThat(articoliRepository.findByCodArt("Vincenzo"))
+		assertThat(articoliRepository.findByCodArt("5001234"))
 			.extracting(Articoli::getDescrizione)
 			.isEqualTo("Articolo di Test V");
 	}
@@ -113,11 +113,8 @@ public class ArticoliRepositoryTest
 	//@Disabled
 	public void TestDelArt() throws Exception
 	{
-		
-		articoliRepository.delete(articoliRepository.findByCodArt("Vincenzo"));
-		
-		assertThat(articoliRepository.findByCodArt("Vincenzo")).isNull();
-				
+		articoliRepository.delete(articoliRepository.findByCodArt("5001234"));
+		assertThat(articoliRepository.findByCodArt("5001234")).isNull();
 	}
 	
 	
